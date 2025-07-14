@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 
+os.environ['DJANGO_ALLOW_INVALID_HOSTS'] = 'true'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,11 +27,11 @@ SECRET_KEY = "django-insecure-#z0z-yrk0m2g1931ou)8e99xfql352qm(#+%iq4j(roah7!$=#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "ivory-2k91.onrender.com",
-    "www.ivoryhospital.com",
-]
-
+# ALLOWED_HOSTS = [
+#     "ivory-2k91.onrender.com",
+#     "www.ivoryhospital.com",
+# ]
+ALLOWED_HOSTS = ["*"]
 print("🚨 CURRENT ALLOWED_HOSTS =", ALLOWED_HOSTS)
 # Application definition
 
