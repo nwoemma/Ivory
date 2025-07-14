@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ivory-2k91.onrender.com").split(",")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'Hospital.settings').split(",")
 
 application = get_wsgi_application()

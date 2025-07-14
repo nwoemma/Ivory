@@ -30,8 +30,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "ivory-2k91.onrender.com",
     "www.ivoryhospital.com",
+    "localhost",
+    "127.0.0.1",
 ]
-
 print("🚨 CURRENT ALLOWED_HOSTS =", ALLOWED_HOSTS)
 # Application definition
 
