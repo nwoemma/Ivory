@@ -27,14 +27,10 @@ SECRET_KEY = "django-insecure-#z0z-yrk0m2g1931ou)8e99xfql352qm(#+%iq4j(roah7!$=#
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "www.ivoryhospital.com"
+    "ivory-2k91.onrender.com",
+    "www.ivoryhospital.com",
 ]
 
-RENDER_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-if RENDER_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_HOSTNAME)
 
 # Application definition
 
