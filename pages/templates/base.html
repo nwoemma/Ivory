@@ -1,0 +1,149 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page_title }}{% endblock %}</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+{% if request.user.is_authenticated %}
+{% if page_title == "Ivory Hospital - Home" %}
+<header>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Welcome Message -->
+            <div class="col-md-4 col-sm-12 text-left d-flex align-items-center">
+                <span>Welcome to a Professional Health Care</span>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-md-4 col-sm-12 text-center bg-primary text-white py-2 d-flex align-items-center justify-content-center">
+                <span class="phone-icon mr-3"><i class="fa fa-phone"></i>Call Us: 010-060-0160</span>
+                <span class="date-icon"><i class="fa fa-calendar-plus-o"></i>Duration: 6:00 AM - 10:00 PM (Mon-Fri)</span>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-4 col-sm-12 text-right bg-dark text-white py-2 d-flex align-items-center justify-content-end">
+                <span class="email-icon"><i class="fas fa-envelope ml-1"></i> <a href="mailto:ivoryhospital12@company.com" class="text-white">Email: ivoryhospital12@company.com</a></span>
+            </div>
+        </div>
+    </div>
+</header>
+{% endif %}
+{% endif %}
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary no-space" style="margin: 0; padding: 0;">
+        <a class="navbar-brand" href="{% url 'pages:home' %}">Ivory Specialist Hospital</a>
+        
+        {% if request.user.is_authenticated %}
+            {% if request.user.role == "doctor" %}
+                <a href="{% url 'doctor:doctor_appointments' %}" class="btn btn-primary">See Appointments</a>
+            {% elif request.user.role == "patient" %}
+                <a href="{% url 'patients:patient_appointments' %}" class="btn btn-primary">Book Appointments</a>             
+            {% endif %}
+        {% endif %}
+        {% if request.user.is_authenticated %}
+        <ul>
+            <li class="nav-item">
+                <a class="btn btn-primary" href="{% url 'chat:chat_room_list' %}">
+                    Chat <i class="fas fa-comments"></i>
+                </a>
+                
+            </li>
+        </ul>
+        {% endif %}
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <a class="nav-link" href="{% url 'pages:authenticated_home' %}">Home</a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                        <a class="nav-link" href="{% url 'pages:about' %}">About Us</a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'services' %}active{% endif %}">
+                        <a class="nav-link" href="{% url 'pages:services' %}">Services</a>
+                    </li>
+                    
+                    {% if request.user.role|lower == "doctor" %}
+                    <li class="nav-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'doctor:doctor_contact' %}">
+                        Contact
+                        </a>
+                    </li>
+                    {% elif request.user.role|lower == "patient" %}
+                    <li class="nav-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'patients:patient_contact' %}">
+                        Contact
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if request.user.role == "doctor" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'doctor:doctor_messages' %}">
+                            <i class="fas fa-envelope ml-1"></i>
+                        </a>
+                    </li>
+                {% elif request.user.role == "patient" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patients:patient_messages' %}">
+                            <i class="fas fa-envelope ml-1"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-icon" href="{% url 'accounts:profile' %}">
+                            <i class="fas fa-user-circle fa-2x"></i>
+                            Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-btn solid-border btn-round-full" href="{% url 'accounts:logoutAccount' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'pages:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-btn solid-border btn-round-full" href="{% url 'accounts:loginAccount' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-btn solid-border btn-round-full" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock content %}
+
+    {% if request.user.is_authenticated %}
+    <!-- Optional Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <p>&copy; 2024 Ivory Hospital. All Rights Reserved.</p>
+        <ul class="list-unstyled">
+            <li><a href="#" class="text-white">Privacy Policy</a></li>
+            <li><a href="#" class="text-white">Terms of Service</a></li>
+        </ul>
+    </footer>
+    {% endif %}
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
