@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [
     "www.ivoryhospital.com",
 ]
 
-
+print("🚨 CURRENT ALLOWED_HOSTS =", ALLOWED_HOSTS)
 # Application definition
 
 INSTALLED_APPS = [
