@@ -26,10 +26,8 @@ SECRET_KEY = "django-insecure-#z0z-yrk0m2g1931ou)8e99xfql352qm(#+%iq4j(roah7!$=#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "ivory-2k91.onrender.com",
-    "www.ivoryhospital.com",
-]
+ALLOWED_HOSTS = ["ivory-2k91.onrender.com", "www.ivoryhospital.com"]
+
 
 
 # Application definition
