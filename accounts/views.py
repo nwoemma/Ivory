@@ -55,14 +55,7 @@ def register(request):
                 form.cleaned_data.get("first_name"),
                 form.cleaned_data.get("last_name"),
             )
-            user = form.save(commit=False)
-            user.username = username
-
-            # Set and hash the password
-            password = form.cleaned_data.get("password1")
-            user.set_password(password)
-
-            user.save()  # Now save the user
+            form.save()
             message = messages.success(request, f"Registration successful.{username} You can now log in.")
             print("User registration successful with username:", username)
             # Send username to email
@@ -103,39 +96,34 @@ def send_username_to_email(request, user):
         messages.error(request, f"Failed to send username: {e}")
 
 
- # if you need to use the user directly
-
 def loginUser(request):
-    form = CustomAuthenticationForm()
-    message = None
+    form = CustomAuthenticationForm(request.POST or None)
 
     if request.method == "POST":
-        form = CustomAuthenticationForm(request, data=request.POST)
-        print(f"Login request method: {request.method}")
-        print(f"Login form data: {request.POST}")
-
         if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            user = authenticate(request, username=username, password=password)
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
 
-            print(f"Authenticated user: {user}")
+            try:
+                user_obj = CustomUser.objects.get(email=email)
+            except CustomUser.DoesNotExist:
+                messages.error(request, "No user found with this email.")
+                return render(request, "accounts/login.html", {"form": form, "page_title": "Login"})
 
-            if user:
+            user = authenticate(request, username=user_obj.username, password=password)
+
+            if user is not None:
                 if not user.is_active:
-                    # Generate activation URL
                     activation_url = request.build_absolute_uri(
-                        reverse('accounts:activate_account', kwargs={
+                        reverse("accounts:activate_account", kwargs={
                             "uidb64": urlsafe_base64_encode(force_bytes(user.pk)),
                             "token": default_token_generator.make_token(user),
                         })
                     )
-
                     activation_message = format_html(
-                        "Your account is inactive. Please activate it. <a href='{}'>Activate Account</a>",
+                        "Your account is inactive. Please activate it. <a href='{}'>Activate</a>",
                         activation_url
                     )
-
                     messages.error(request, activation_message)
                     return redirect("accounts:loginAccount")
 
@@ -143,12 +131,10 @@ def loginUser(request):
                 messages.success(request, f"Welcome back, {user.first_name}!")
                 return redirect("accounts:profile")
             else:
-                message = "Invalid username or password."
-                messages.error(request, message)
+                messages.error(request, "Invalid email or password.")
         else:
-            print("Authentication failed: Form not valid.")
-            print(form.errors)
-            messages.error(request, "Invalid login credentials.")
+            messages.error(request, "Please correct the errors below.")
+            print("Form errors:", form.errors)
 
     return render(request, "accounts/login.html", {
         "form": form,

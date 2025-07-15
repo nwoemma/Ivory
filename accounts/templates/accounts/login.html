@@ -16,9 +16,9 @@
             <form method="post" action="{% url 'accounts:loginAccount' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
-                    {{ form.username|add_class:"form-control" }}
-                    {{ form.username.errors }}
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                    {{ form.email|add_class:"form-control" }}
+                    {{ form.email.errors }}
                 </div>
 
                 <div class="form-group">

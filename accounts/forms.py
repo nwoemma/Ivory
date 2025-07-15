@@ -27,6 +27,7 @@ class CustomUserChangeForm(forms.ModelForm):
             "first_name",
             "last_name",
             "email",
+            "username",
             "role",
             "department",
             "specialty",
@@ -40,13 +41,22 @@ class CustomUserChangeForm(forms.ModelForm):
         )
 
 
-class CustomAuthenticationForm(AuthenticationForm):
-    class Meta:
-        model = CustomUser
-        fields = ("username", "password")
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["username"].label = "Username"
+class CustomAuthenticationForm(forms.Form):
+    email = forms.EmailField(label="Email", max_length=254)
+    password = forms.CharField(label="Password", strip=False, widget=forms.PasswordInput)
+
+    def clean(self):
+        email = self.cleaned_data.get("email")
+        password = self.cleaned_data.get("password")
+
+        if email and password:
+            user = CustomUser.objects.filter(email=email).first()
+            if user is None:
+                raise forms.ValidationError("No user with this email.")
+            if not user.check_password(password):
+                raise forms.ValidationError("Invalid password.")
+        return self.cleaned_data
+
 
 
 class CustomPasswordResetForm(PasswordResetForm):

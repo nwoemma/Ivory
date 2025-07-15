@@ -139,8 +139,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.backend.EmailOrUsernameBackend',  # custom backend
-    'django.contrib.auth.backends.ModelBackend',  # default fallback
+    'accounts.backend.EmailOrUsernameBackend',  # custom backend  # default fallback
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"
