@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import handler404, handler500
 
+handler404 = "pages.views.custom_404"
+# handler500 = "pages.views.custom_500"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("pages.urls", namespace="pages")),  # Main page URL

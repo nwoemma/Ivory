@@ -27,6 +27,43 @@
         {% block content %}
         {% endblock %}
     </div>
+    <!-- Footer -->
+<footer class="bg-dark text-white mt-5">
+    <div class="container py-4">
+        <div class="row">
+            <!-- About -->
+            <div class="col-md-4">
+                <h5>About Us</h5>
+                <p class="text-muted">We provide excellent healthcare services and a user-friendly hospital management experience.</p>
+            </div>
+
+            <!-- Links -->
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'home' %}" class="text-white">Home</a></li>
+                    <li><a href="{% url 'accounts:register' %}" class="text-white">Register</a></li>
+                    <li><a href="{% url 'accounts:loginAccount' %}" class="text-white">Login</a></li>
+                    <li><a href="#" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <p class="text-muted mb-1">Email: support@hospital.com</p>
+                <p class="text-muted mb-1">Phone: +234 800 123 4567</p>
+                <p class="text-muted">Address: 123 Health St., Abia State</p>
+            </div>
+        </div>
+
+        <hr class="bg-white">
+
+        <div class="text-center text-muted">
+            &copy; {{ year|default:2025 }} Hospital System. All rights reserved.
+        </div>
+    </div>
+</footer>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>

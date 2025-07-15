@@ -8,7 +8,8 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = (
-            "username",
+            "first_name",
+            "last_name",
             "email",
             "role",
             "department",
@@ -23,7 +24,8 @@ class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = (
-            "username",
+            "first_name",
+            "last_name",
             "email",
             "role",
             "department",
@@ -42,6 +44,9 @@ class CustomAuthenticationForm(AuthenticationForm):
     class Meta:
         model = CustomUser
         fields = ("username", "password")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].label = "Username"
 
 
 class CustomPasswordResetForm(PasswordResetForm):

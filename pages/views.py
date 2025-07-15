@@ -24,7 +24,7 @@ def page_view(request, page_name):
 
 
 def custom_404(request, exception):
-    return render(request, "404.html", status=404)
+    return render(request, "pages/404.html", status=404)
 
 
 @login_required

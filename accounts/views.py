@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.utils.html import format_html
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -21,7 +23,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.http import urlsafe_base64_decode
 from .models import CustomUser
 from django.utils.encoding import force_bytes
-
+import random
+import string
 
 def page_view(request, page_name):
     titles = {
@@ -38,15 +41,31 @@ def page_view(request, page_name):
     title = titles.get(page_name, "Default Title")
     return render(request, f"{page_name}.html", {"page_title": title})
 
-
+def generate_username(first_name, last_name):
+    base = (first_name + last_name).lower().replace(" ", "")
+    suffix = ''.join(random.choices(string.digits, k=5))
+    return f"{base}{suffix}"
 # Registration View
 def register(request):
-    
+    message = None
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Registration successful. You can now log in.")
+            username = generate_username(
+                form.cleaned_data.get("first_name"),
+                form.cleaned_data.get("last_name"),
+            )
+            user = form.save(commit=False)
+            user.username = username
+
+            # Set and hash the password
+            password = form.cleaned_data.get("password1")
+            user.set_password(password)
+
+            user.save()  # Now save the user
+            message = messages.success(request, f"Registration successful.{username} You can now log in.")
+            print("User registration successful with username:", username)
+            # Send username to email
             return redirect("accounts:loginAccount")
         else:
             # Log detailed form errors
@@ -55,25 +74,102 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(
-        request, "accounts/register.html", {"form": form, "page_title": "Register"}
+        request, "accounts/register.html", {"form": form, "page_title": "Register", "message":message}
     )
 
+def send_username_to_email(request, user):
+    subject = "Your Username for Ivory Hospital"
+    email_template_name = "accounts/username_email.html"
+    context = {
+        "username": user.username,
+        "domain": request.META["HTTP_HOST"],
+        "site_name": "Ivory Hospital",
+        "protocol": "http",
+        "user": user,
+    }
+    email_body = render_to_string(email_template_name, context)
+    plain_message = strip_tags(email_body)
 
-# Login View
+    try:
+        send_mail(
+            subject,
+            plain_message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
+        messages.success(request, "Username has been sent to your email.")
+    except Exception as e:
+        messages.error(request, f"Failed to send username: {e}")
+
+
+ # if you need to use the user directly
+
 def loginUser(request):
+    form = CustomAuthenticationForm()
+    message = None
+
     if request.method == "POST":
         form = CustomAuthenticationForm(request, data=request.POST)
+        print(f"Login request method: {request.method}")
+        print(f"Login form data: {request.POST}")
+
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect("accounts:profile")
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(request, username=username, password=password)
+
+            print(f"Authenticated user: {user}")
+
+            if user:
+                if not user.is_active:
+                    # Generate activation URL
+                    activation_url = request.build_absolute_uri(
+                        reverse('accounts:activate_account', kwargs={
+                            "uidb64": urlsafe_base64_encode(force_bytes(user.pk)),
+                            "token": default_token_generator.make_token(user),
+                        })
+                    )
+
+                    activation_message = format_html(
+                        "Your account is inactive. Please activate it. <a href='{}'>Activate Account</a>",
+                        activation_url
+                    )
+
+                    messages.error(request, activation_message)
+                    return redirect("accounts:loginAccount")
+
+                login(request, user)
+                messages.success(request, f"Welcome back, {user.first_name}!")
+                return redirect("accounts:profile")
+            else:
+                message = "Invalid username or password."
+                messages.error(request, message)
         else:
-            messages.error(request, "Invalid username or password.")
+            print("Authentication failed: Form not valid.")
+            print(form.errors)
+            messages.error(request, "Invalid login credentials.")
+
+    return render(request, "accounts/login.html", {
+        "form": form,
+        "page_title": "Login",
+    })
+
+def activate_account(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, "Your account has been activated successfully.")
+        return redirect("accounts:loginAccount")
     else:
-        form = CustomAuthenticationForm()
-    return render(request, "accounts/login.html", {"form": form, "page_title": "Login"})
-
-
+        messages.error(request, "The activation link is invalid or has expired.")
+        return redirect("accounts:loginAccount")
 # Logout View
 def logoutUser(request):
     logout(request)

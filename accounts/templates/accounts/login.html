@@ -3,6 +3,12 @@
 {% block title %}Login{% endblock %}
 {% load widget_tweaks %}
 {% block content %}
+
+{% if message %}
+<div class="alert alert-info" role="alert">
+    {{ message }}   
+</div>
+{% endif %}
 <div class="container mt-5">
     <h2 class="text-center mb-4">{{ page_title }} Here</h2>
     <div class="row justify-content-center">
